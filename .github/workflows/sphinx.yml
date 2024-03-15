@@ -48,4 +48,4 @@ jobs:
           sphinx-build --keep-going -b html . _build/html
       - name: Run ghp-import
         run: |
-          ghp-import -n -p -f blog/docs/_build/html
+          ghp-import -n -p -f docs/_build/html
