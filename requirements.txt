@@ -8,6 +8,13 @@
 # openpyxl
 # tables
 # tqdm
+IPython
+ghp-import
+scikit-image
+matplotlib
+pandas
+seaborn
+scikit-learn
 sphinx
 pydata-sphinx-theme
 ablog
