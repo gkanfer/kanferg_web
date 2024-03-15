@@ -13,6 +13,6 @@ pydata-sphinx-theme
 ablog
 myst-nb
 sphinx_design
-sphinext-opengraph
+# sphinext-opengraph
 sphinx-copybutton
 jupytext  
