@@ -45,7 +45,7 @@ jobs:
       - name: Build HTML
         run: |
           cd blog
-          sphinx-build -nW --keep-going -b html . blog/docs/_build/html
+          sphinx-build --keep-going -b html . blog/docs/_build/html
       - name: Run ghp-import
         run: |
           ghp-import -n -p -f blog/docs/_build/html
