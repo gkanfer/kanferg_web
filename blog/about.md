@@ -54,7 +54,6 @@ I have been recognized for my contributions to the field with several awards and
 
 ## Contact Me
 Gil Kanfer, PhD
-11908 Bargate Court, Rockville MD, 20852
 Gil.kanfer.il@gmail.com | 301.580.0189
 
 I am eager to explore opportunities where I can apply my extensive knowledge in data science, machine learning, and genomics to make impactful advancements in health and medicine. Please feel free to reach out to discuss potential collaborations or opportunities!

@@ -5,7 +5,7 @@
 project = "Gil Kanfer, PhD" 
 copyright = "Gil Kanfer"
 author = "Gil Kanfer"
-html_title = "Gil Kanfer"
+html_title = "Gil Kanfer - Data Scientist "
 
 # load extensions
 extensions = [
