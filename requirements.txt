@@ -8,11 +8,11 @@ IPython
 openpyxl
 tables
 tqdm
-# sphinx
-# pydata-sphinx-them
-# ablog
-# myst-nb
-# sphinx_design
-# sphinext-opengraph
-# sphinx-copybutton
-# jupytext  
+sphinx
+pydata-sphinx-them
+ablog
+myst-nb
+sphinx_design
+sphinext-opengraph
+sphinx-copybutton
+jupytext  
