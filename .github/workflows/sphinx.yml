@@ -36,7 +36,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r docs_requirements.txt
+          pip install -r requirements.txt
       # Configure git user information
       - name: Configure git user
         run: |
