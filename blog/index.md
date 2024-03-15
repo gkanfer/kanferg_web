@@ -7,8 +7,6 @@ html_meta:
   "property=og:description": "Gil Kanfer's portfolio on Computational Biology and Genomics. Discover my journey from deep learning applications to genome analysis. A look into the fascinating world of computational biology."
 ---
 
-# Gil Kanfer, PhD
-
 ::::{grid}
 :::{grid-item-card}
 :link: about.html

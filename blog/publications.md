@@ -1,10 +1,6 @@
 # publications
 
-# Publication List
-
-## Kanfer, G. et al.
-
-### In Preparation
+## In Preparation
 
 * Kanfer, G., Banerjee, S., Prinz, W., Youle, R. AI-PS version 2: upgraded optical screening platform. In preparation.
 
