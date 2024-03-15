@@ -1,15 +1,15 @@
-pytensors
-pymc
-matplotlib
-pandas
-seaborn
-scikit-learn
-IPython
-openpyxl
-tables
-tqdm
+# pytensors
+# pymc
+# matplotlib
+# pandas
+# seaborn
+# scikit-learn
+# IPython
+# openpyxl
+# tables
+# tqdm
 sphinx
-pydata-sphinx-them
+pydata-sphinx-theme
 ablog
 myst-nb
 sphinx_design
