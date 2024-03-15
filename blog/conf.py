@@ -31,6 +31,7 @@ exclude_patterns = [
     "README.md",
     "**/.ipynb_checkpoints/*",
     "docs",
+    "temp",
 ]
 nitpicky = True
 
@@ -56,8 +57,13 @@ html_favicon = "_static/images/logo.ico"
 
 # MyST
 myst_enable_extensions = [
-    "colon_fence", # ::: syntax
+    "amsmath",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "html_image",
 ]
+myst_url_schemes = ("http", "https", "mailto")
 
 html_theme_options = {
     "search_bar_text": "Search this site...",
@@ -90,7 +96,7 @@ html_sidebars = {
 html_css_files = ["css/mycss.css"]
 
 
-
+jupyter_execute_notebooks = "off"
 
 blog_title = "Gil Kanfer, PhD"
 blog_path = "blog"
