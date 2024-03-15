@@ -44,7 +44,6 @@ jobs:
           git config --global user.name "gkanfer"
       - name: Build HTML
         run: |
-          cd blog/
           sphinx-build -nW --keep-going -b html blog blog/docs/_build/html
       - name: Run ghp-import
         run: |
