@@ -89,7 +89,8 @@ html_theme_options = {
 templates_path = ["_templates"]
 html_sidebars = {
     "index": ["gil-kanfer-profile.html"],
-    "projects": ["gil-kanfer-profile.html"]
+    "projects": ["gil-kanfer-profile.html"],
+    "publications": ["gil-kanfer-profile.html"]
 }
 
 html_css_files = ["css/mycss.css"]

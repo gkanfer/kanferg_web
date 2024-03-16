@@ -1,3 +1,4 @@
 .vscode/
 .venv/
 blog/temp/
+blog/docs/_build/html/

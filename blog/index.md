@@ -14,15 +14,15 @@ html_meta:
 :::
 :::{grid-item-card}
 :link: projects.html
-🧬 Personal projects 
+🧬 Personal Projects 
 :::
 :::{grid-item-card}
 :link: blog.html
-📗 My blog
+📗 My Blog
 :::
 :::{grid-item-card}
 :link: publications.html
-📚 My publications
+📚 My Publications
 :::
 ::::
 

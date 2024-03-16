@@ -5,7 +5,7 @@ html_meta:
   "keywords": "Data Science, Machine Learning, Computational Biology, Genomics, Gil Kanfer"
   "property=og:locale": "en_US"
 ---
-# About me
+# About Me
 
 I am a passionate and driven scientist with a PhD in Biochemistry, boasting 12 years of expertise in data science, machine learning, computer vision, and genomics/metagenomics data analysis. My journey led me to spearhead the development and integration of advancements in deep convolutional network technology for genomic discoveries. My goal is to leverage machine learning and computational methods to substantially enhance human health and well-being.
 
