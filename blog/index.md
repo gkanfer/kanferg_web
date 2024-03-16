@@ -2,7 +2,7 @@
 html_theme.sidebar_secondary.remove: true
 html_meta:
   "description lang=en": "Gil Kanfer's portfolio on Computational Biology and Genomics. Discover my journey from deep learning applications to genome analysis. A look into the fascinating world of computational biology."
-  "keywords": "Computational Biology, Genomics, Machine Learning, Gil Kanfer"
+  "keywords": "Computational Biology, Machine Learning, Genomics, Computer Vision  Gil Kanfer"
   "property=og:locale": "en_US"
   "property=og:description": "Gil Kanfer's portfolio on Computational Biology and Genomics. Discover my journey from deep learning applications to genome analysis. A look into the fascinating world of computational biology."
 ---

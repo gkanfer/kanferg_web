@@ -5,7 +5,7 @@
 project = "Gil Kanfer, PhD" 
 copyright = "Gil Kanfer"
 author = "Gil Kanfer"
-html_title = "Gil Kanfer - Data Scientist "
+html_title = "💻🧬📊🔬💊📚"
 
 # load extensions
 extensions = [
@@ -89,7 +89,6 @@ html_theme_options = {
 templates_path = ["_templates"]
 html_sidebars = {
     "index": ["gil-kanfer-profile.html"],
-    "about": ["gil-kanfer-profile.html"],
     "projects": ["gil-kanfer-profile.html"]
 }
 
