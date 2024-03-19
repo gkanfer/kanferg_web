@@ -5,7 +5,8 @@
 project = "Gil Kanfer, PhD" 
 copyright = "Gil Kanfer"
 author = "Gil Kanfer"
-html_title = "💻🧬📊🔬💊📚"
+html_logo = "_static/images/bayes_logo_.png"
+
 
 # load extensions
 extensions = [

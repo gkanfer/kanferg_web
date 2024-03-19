@@ -2,3 +2,4 @@
 .venv/
 blog/temp/
 blog/docs/_build/html/
+requirements_temp.txt
