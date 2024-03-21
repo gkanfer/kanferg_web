@@ -5,7 +5,7 @@
 project = "Gil Kanfer, PhD" 
 copyright = "Gil Kanfer"
 author = "Gil Kanfer"
-html_logo = "_static/images/bayes_logo_.png"
+html_logo = "_static/images/logo_GPT_react.png"
 
 
 # load extensions
