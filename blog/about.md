@@ -9,9 +9,48 @@ html_meta:
 
 I am a passionate and driven scientist with a PhD in Biochemistry, boasting 12 years of expertise in data science, machine learning, computer vision, and genomics/metagenomics data analysis. My journey led me to spearhead the development and integration of advancements in deep convolutional network technology for genomic discoveries. My goal is to leverage machine learning and computational methods to substantially enhance human health and well-being.
 
-<div style="text-align: center;">
-<img src="_static/images/43918436.png" />
+<div class="container">
+  <div class="top-content">
+    <img src="_static/images/Gran.png" alt="Image" class="image">
+    <video autoplay loop muted class="video2">
+      <source src="_static/images/TFEB_translocation_intro_RGB_18hr.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+  <video autoplay loop muted class="video1">
+    <source src="_static/images/JCB_202006180_V1.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
 </div>
+
+<style>
+.container {
+  width: 550px;
+  height: auto; 
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+}
+
+.top-content {
+  display: flex; /* Make this a flex container too, to align children side by side */
+  width: 100%;
+}
+
+.top-content .image {
+  width: 60%;
+  height: auto;
+}
+
+.top-content .video2 {
+  width: 40%; /* Half the width for each */
+  height: auto; /* Adjust height automatically to keep aspect ratio */
+}
+
+.video1 {
+  width: 100%;
+  height: auto;
+}
+</style>
 
 ## Professional Journey
 

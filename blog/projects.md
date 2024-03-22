@@ -61,4 +61,31 @@ I have developed an [Automated Pipeline for Genomic Data Analysis](https://githu
 The project on [Characterizing Protein-Protein Interactions](https://github.com/gkanfer/AIPySdeAnalyzer) involves in-depth proteomic analyses to understand the dynamics of protein interaction networks in dividing cells. Utilizing affinity purification coupled with SILAC, this research offers insights into the molecular mechanisms regulating cell division and highlights potential therapeutic targets for cellular dysfunction diseases. The application of this knowledge spans numerous fields, including cancer research and neurodegenerative disease studies.
 ````
 
+
+````{grid-item}
+:columns: 3
+[![Gene Enrichment Analysis](/_static/images/fly.png)](https://github.com/gkanfer/Image_dispaly_96wellPlate)
+````
+````{grid-item}
+:columns: 9
+
+Here [Project showcases](https://doi.org/10.1371/journal.pgen.1010828) my contributions to understanding Parkinson's disease by creating and utilizing a custom pipeline for analyzing transcriptomic data from Parkin and STING gene mutants in animal models. This pipeline integrates bioinformatics methodologies to reveal insights into the genetic mechanisms of disease progression. Additionally, I've implemented a Gene Enrichment Analysis Pipeline to systematically identify significant pathways and gene functions that may play a role in Parkinson's pathology. These tools have been instrumental in uncovering potential therapeutic targets. project showcases my contributions to understanding Parkinson's disease by creating and utilizing a custom pipeline for analyzing transcriptomic data from Parkin and STING gene mutants in animal models. This pipeline integrates bioinformatics methodologies to reveal insights into the genetic mechanisms of disease progression. Additionally, I've implemented a Gene Enrichment Analysis Pipeline to systematically identify significant pathways and gene functions that may play a role in Parkinson's pathology. These tools have been instrumental in uncovering potential therapeutic targets.
+````
 `````
+## Expanding Localisation Microscopy Analysis
+`````{grid} 2
+
+````{grid-item}
+:columns: 3
+
+[![SMLM](/_static/images/smlm.gif)](https://github.com/gkanfer/AIPSr)
+
+````
+````{grid-item}
+:columns: 9
+
+Version 2 project is a monumental stride towards enhancing the analysis of localisation microscopy images. By incorporating sophisticated machine learning algorithms with high computing power, I've enabled faster and more accurate identification and subsequent analysis of microbial interactions. This toolkit has been instrumental in expediting breakthroughs in microorganism research and understanding of localisation microscopy.
+````
+
+`````
+
