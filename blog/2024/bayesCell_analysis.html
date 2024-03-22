@@ -1,0 +1,1148 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+<meta property="og:title" content="Using the Bayesian Approach with PyMC to Analyze Functional Genomics Screens, Part 1" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="blog/2024/bayesCell_analysis.html" />
+<meta property="og:site_name" content="MyST-NB Quickstart" />
+<meta property="og:description" content="Welcome to the first installment of my blog series, where I delve into the application of Bayesian statistics in the realm of genetics. While Bayesian techniques are prominently featured across var..." />
+<meta property="og:image:width" content="1146" />
+<meta property="og:image:height" content="600" />
+<meta property="og:image" content="/_images/social_previews/summary_blog_2024_bayesCell_analysis_efd89b22.png" />
+<meta property="og:image:alt" content="Welcome to the first installment of my blog series, where I delve into the application of Bayesian statistics in the realm of genetics. While Bayesian techni..." />
+<meta name="description" content="Welcome to the first installment of my blog series, where I delve into the application of Bayesian statistics in the realm of genetics. While Bayesian techniques are prominently featured across var..." />
+<meta name="twitter:card" content="summary_large_image" />
+
+    <title>Using the Bayesian Approach with PyMC to Analyze Functional Genomics Screens, Part 1 &#8212; MyST-NB Quickstart  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/mycss.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'blog/2024/bayesCell_analysis';</script>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>  
+<style type="text/css">
+  ul.ablog-archive {
+    list-style: none;
+    overflow: auto;
+    margin-left: 0px;
+  }
+  ul.ablog-archive li {
+    float: left;
+    margin-right: 5px;
+    font-size: 80%;
+  }
+  ul.postlist a {
+    font-style: italic;
+  }
+  ul.postlist-style-disc {
+    list-style-type: disc;
+  }
+  ul.postlist-style-none {
+    list-style-type: none;
+  }
+  ul.postlist-style-circle {
+    list-style-type: circle;
+  }
+</style>
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this site..."
+         aria-label="Search this site..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/logo_GPT_react.png" class="logo__image only-light" alt="MyST-NB Quickstart  documentation - Home"/>
+    <script>document.write(`<img src="../../_static/logo_GPT_react.png" class="logo__image only-dark" alt="MyST-NB Quickstart  documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../about.html">
+                        About Me
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../projects.html">
+                        My projects
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../blog.html">
+                        Blog
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../publications.html">
+                        Publications
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/gkanfer" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/gil_kanfer" title="Twitter" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-twitter fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.linkedin.com/in/gil-kanfer-b8684028/" title="LinkedIn" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-linkedin fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">LinkedIn</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../about.html">
+                        About Me
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../projects.html">
+                        My projects
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../blog.html">
+                        Blog
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../publications.html">
+                        Publications
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/gkanfer" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/gil_kanfer" title="Twitter" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-twitter fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">Twitter</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.linkedin.com/in/gil-kanfer-b8684028/" title="LinkedIn" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-linkedin fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">LinkedIn</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Using the...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                   <section class="tex2jax_ignore mathjax_ignore" id="using-the-bayesian-approach-with-pymc-to-analyze-functional-genomics-screens-part-1">
+<h1>Using the Bayesian Approach with PyMC to Analyze Functional Genomics Screens, Part 1<a class="headerlink" href="#using-the-bayesian-approach-with-pymc-to-analyze-functional-genomics-screens-part-1" title="Permalink to this heading">#</a></h1>
+<p>Welcome to the first installment of my blog series, where I delve into the application of Bayesian statistics in the realm of genetics. While Bayesian techniques are prominently featured across various fields—from economics to sports to physics—there seems to be a gap in resources when it comes to genetics, particularly in complex scenarios specific to cell biology.</p>
+<p>You might come across ample introductory material and straightforward examples on the subject, but the literature is sparse when it seeks to address the intricacies of cellular-based genetic screens. Recognizing this void, I have elected to divide this blog into three parts. In the first two installments, I’ll showcase the use of Bayesian inference to detect gene enrichment in cellular-based image genetic screens, with an emphasis on model development and analysis. The third entry will illustrate a practical application of Bayesian statistics in the classification of cells from microscopy images.</p>
+<p>My intention is to focus predominantly on practical applications within these blogs. To ensure a comprehensive understanding, I’ll reference theory from various sources, including textbooks, scientific articles, and resourceful online content.</p>
+<p>In the dynamic fields of experimental cell biology and genetics, the tools we use to analyze our data are crucial. For many researchers, popular software packages like edgeR or DESeq2 might seem like the go-to options for analyzing data. However, there are instances where these tools might not be enough. In such cases, customizing your own statistical inference framework tailored specifically to your data becomes paramount. This is where Bayesian inference can offer invaluable insights.</p>
+<div class="admonition-popular-gene-enrichment-techniques admonition">
+<p class="admonition-title">Popular Gene enrichment techniques</p>
+<p>Great source of information from Xiaole Shirley Liu’s YouTube channel, offering a very nice summary of methods in differential expression. <a class="reference external" href="https://www.youtube.com/watch?v=UFB993xufUU&amp;list=PLeB-Dlq-v6taAXK6ZCGfqImrNWJzFt3p3&amp;index=28">youtube</a></p>
+</div>
+<p>Biological systems are complex and often chaotic, which means investigating them requires a thorough and nuanced approach. To illustrate this, let’s delve into a case study from the experimental realm of cell biology, focusing on CRISPR-based functional genomic screening. While this notebook employs several advanced concepts, such as prior prediction analysis, centered vs. non-centered reparameterization in hierarchical modeling, and an in-depth exploration of varying effects, the primary focus here is on practical application and implementation, rather than on reintroducing these well-explained concepts.</p>
+<div class="admonition-important-concepts-in-bayesian-applications admonition">
+<p class="admonition-title">Important Concepts in Bayesian Applications</p>
+<ul class="simple">
+<li><p>prior prediction analysis: In this talk, Justin Bois provides a thorough approach to prior setting and analysis. For a deep dive into his methodology, watch <a class="reference external" href="https://www.youtube.com/watch?v=U1SyOl0lvXw">Learning Bayesian Statistics</a></p></li>
+<li><p>centered vs. non-centered reparameterization and varying effect: For a concise summary of these concepts, check out the compelling example of Radon contamination in the PyMC example gallery at  <a class="reference external" href="https://www.pymc.io/projects/examples/en/latest/generalized_linear_models/multilevel_modeling.html">PyMC Example Gallery</a></p></li>
+</ul>
+</div>
+<p>Each of these topics could easily be the subject of its own detailed blog post. However, my objective today is to share an approach that I’ve found particularly effective in tackling data from this field. Future posts will explore these subjects more thoroughly.</p>
+<section id="the-challenge-at-hand">
+<h2>The Challenge at Hand<a class="headerlink" href="#the-challenge-at-hand" title="Permalink to this heading">#</a></h2>
+<p>The problem we’re addressing is not new but continues to be relevant: how to analyze vast amounts of genetic data when our sample sizes are limited. This is often referred to as the “large p, small n” problem. It’s a challenge that traces back to the foundational work that persists in modern techniques like CRISPR and RNAi screens, which aim to decipher gene functions at the molecular level. To navigate this challenge, we propose a solution rooted in Bayesian and causal inference, designed specifically to identify upregulated genes from such datasets.</p>
+<p>Drawing inspiration from Richard McElreath’s “Fortune Telling Frameworks,” our analysis approach includes setting clear goals, defining assumptions, establishing priors and prior prediction analysis, simulating and comparing models, and reporting findings. Importantly, this approach is iterative, allowing for adjustments as new data emerges.</p>
+<p>A critical first step in our analysis is acknowledging the high level of dispersion in our dataset. This dispersion stems from biological variability and experimental conditions, such as a high multiplicity of infection (MOI), which complicates the analysis by introducing collider effects.</p>
+</section>
+<section id="simulating-the-dynamics-of-crispr-screens-and-diving-into-eda">
+<h2>Simulating the Dynamics of CRISPR Screens and Diving Into EDA<a class="headerlink" href="#simulating-the-dynamics-of-crispr-screens-and-diving-into-eda" title="Permalink to this heading">#</a></h2>
+<p>Delving into the world of CRISPR screen simulations requires precise tools and methods. We’ve developed a Python package specifically designed to simulate the complex dynamics of CRISPR screens, providing control over a wide range of parameters.</p>
+<section id="getting-started-with-the-package">
+<h3>Getting Started with the Package<a class="headerlink" href="#getting-started-with-the-package" title="Permalink to this heading">#</a></h3>
+<p>To begin, install the package using the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">AIPySdeAnalyzer</span><span class="o">==</span><span class="m">0</span>.2.8
+</pre></div>
+</div>
+<p>This package is your gateway to generating realistic CRISPR screen data for analysis.</p>
+</section>
+<section id="phase-1-simulating-initial-sgrna-interactions">
+<h3>Phase 1: Simulating Initial sgRNA Interactions<a class="headerlink" href="#phase-1-simulating-initial-sgrna-interactions" title="Permalink to this heading">#</a></h3>
+<p>Our simulation starts with the initial interaction between cells and sgRNAs. We model this as <span class="math notranslate nohighlight">\(H_{t_0}\)</span>, representing sgRNA read counts before the screening process begins. The model relies on a multinomial distribution influenced by initial plasmid read counts (<span class="math notranslate nohighlight">\(m\)</span>), which follow a negative binomial distribution:</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align*}
+f(H_{t_0}) = \frac{\binom{r}{H_{t_0}}\binom{N-r}{n-H_{t_0}}}{\binom{N}{n}},
+\end{align*}
+\]</div>
+<p>This equation factors in infection efficiency and the prior abundance of sgRNAs, where <span class="math notranslate nohighlight">\(r\)</span> is total successful sgRNA incorporations, <span class="math notranslate nohighlight">\(n\)</span> is total cells, and <span class="math notranslate nohighlight">\(N\)</span> is virus particles.</p>
+<div class="admonition-simulating-cell-biology-experiments admonition">
+<p class="admonition-title">Simulating Cell Biology Experiments</p>
+<p>For an insightful look at the impact of statistical multiplicity of infection on virus quantification and infectivity assays, refer to <a class="reference external" href="https://pubmed.ncbi.nlm.nih.gov/29925033/">“The Effects of Statistical Multiplicity of Infection on Virus Quantification and Infectivity Assays”</a>. This paper presents a robust approach to cell infection with a focus on creating a mutant cell population.</p>
+</div>
+<p>We simulate a scenario where each of 300 genes is targeted by 5 unique sgRNAs. You have the flexibility to define key parameters, such as the number of genes that are true targets and the number of sgRNAs that effectively target these genes. This phase prepares our dataset for further analysis.</p>
+</section>
+<section id="phase-2-post-screening-simulation">
+<h3>Phase 2: Post-Screening Simulation<a class="headerlink" href="#phase-2-post-screening-simulation" title="Permalink to this heading">#</a></h3>
+<p>After the initial setup, phase 2 simulates the post-screening outcomes, focusing on sgRNAs that successfully target key genes. This phase introduces variability through a binomial distribution, reflecting the random nature of biological systems and experimental conditions. We also simulate false positive rates to mimic potential errors in the screening process.</p>
+<p>The step-by-step approach in this phase allows us to:</p>
+<ol class="arabic simple">
+<li><p>Identify sgRNAs that effectively target specific genes.</p></li>
+<li><p>Simulate the selection process with a degree of randomness.</p></li>
+<li><p>Assess the impact of sgRNAs on cell phenotype, giving insights into their effectiveness.</p></li>
+</ol>
+<p>To run the simulation and generate data, use the following command:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">runSimulation</span><span class="p">(</span><span class="n">targetNum</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">geneNum</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span> <span class="n">effectSgRNA</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">getData</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">mu</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="mf">1.2</span><span class="p">,</span> <span class="n">low</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">10_000</span><span class="p">,</span> <span class="n">FalseLimits</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="mf">0.25</span><span class="p">),</span> <span class="n">ObservationNum</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This operation produces a dataset where 300 genes, targeted by 5 sgRNAs each, are grouped according to their sample categories: initial master plasmid (M), before screening (<span class="math notranslate nohighlight">\(H_{t_0}\)</span>), and after screening (<span class="math notranslate nohighlight">\(H_{t_1}\)</span>).</p>
+<p>By following these steps, researchers can generate simulated data that closely mirrors real CRISPR screen dynamics, laying a solid foundation for in-depth exploratory data analysis.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">arviz</span> <span class="k">as</span> <span class="nn">az</span>
+<span class="kn">import</span> <span class="nn">pymc</span> <span class="k">as</span> <span class="nn">pm</span>
+<span class="kn">import</span> <span class="nn">pytensor.tensor</span> <span class="k">as</span> <span class="nn">pt</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="o">%</span><span class="n">config</span> <span class="n">InlineBackend</span><span class="o">.</span><span class="n">figure_format</span> <span class="o">=</span> <span class="s1">&#39;retina&#39;</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="p">(</span><span class="ne">FutureWarning</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">))</span>
+<span class="n">RANDOM_SEED</span> <span class="o">=</span> <span class="mi">8927</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">RANDOM_SEED</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+<span class="c1">#plt.rcParams[&#39;text.usetex&#39;] = True</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="c1"># plt.style.use(&#39;fivethirtyeight&#39;)</span>
+<span class="kn">from</span> <span class="nn">aipys_analyse.simulation.runSimulation</span> <span class="kn">import</span> <span class="n">runSimulation</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">runSimulation</span><span class="p">(</span><span class="n">targetNum</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">geneNum</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">effectSgRNA</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span><span class="n">getData</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">mu</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="mf">1.2</span><span class="p">,</span><span class="n">low</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">high</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span><span class="n">size</span> <span class="o">=</span> <span class="mi">10_000</span><span class="p">,</span><span class="n">FalseLimits</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="mf">0.5</span><span class="p">),</span><span class="n">ObservationNum</span> <span class="o">=</span> <span class="p">(</span><span class="mi">70</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+
+<span class="n">dftall</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dfTall</span>
+<span class="n">dftall</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dftall</span><span class="p">[</span><span class="s1">&#39;readCount&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;readCount&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">dftall</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dftall</span><span class="p">[</span><span class="s1">&#39;readCount&#39;</span><span class="p">]</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;readCount&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dftall</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">palette1</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">&quot;colorblind&quot;</span><span class="p">,</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">selcolor</span> <span class="o">=</span> <span class="p">[</span><span class="n">palette1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
+<span class="n">tags</span> <span class="o">=</span> <span class="n">dftall</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+<span class="n">color_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="n">selcolor</span><span class="p">))</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+<span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">dftall</span><span class="p">[</span><span class="n">dftall</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">tag</span><span class="p">][</span><span class="s1">&#39;readCount&#39;</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">color_dict</span><span class="p">[</span><span class="n">tag</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Tag&#39;</span><span class="p">)</span>
+<span class="n">x_ticks</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_xticks</span><span class="p">()</span>
+<span class="n">new_x_ticks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">x_ticks</span><span class="p">),</span> <span class="n">stop</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">x_ticks</span><span class="p">),</span> <span class="n">num</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">new_x_ticks</span><span class="p">)</span>
+
+<span class="n">_</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">plot_kde</span><span class="p">(</span><span class="n">dftall</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dftall</span><span class="p">[</span><span class="s2">&quot;tag&quot;</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;readCount&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">/</span> <span class="n">dftall</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dftall</span><span class="p">[</span><span class="s2">&quot;tag&quot;</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span><span class="s2">&quot;readCount&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">plot_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span><span class="n">selcolor</span><span class="p">[</span><span class="mi">0</span><span class="p">]},</span><span class="n">textsize</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;fold change ($\frac{H_</span><span class="si">{t1}</span><span class="s2">}{H_</span><span class="si">{t0}</span><span class="s2">}$)&quot;</span><span class="p">)</span>
+<span class="c1"># axes[3].set_ylabel(r&quot;$H_{t1}$&quot;)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">wspace</span> <span class="o">=</span> <span class="mf">0.6</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<p><img alt="Some description" src="../../_images/output_3_0.png" /></p>
+<p>Incorporating insights from Richard McElreath’s <em>Statistical Rethinking</em>, one critical step in the Bayesian framework is to define a clear research objective. This means specifying precisely what we aim to understand or predict for our investigation. Given the data, our prior knowledge (including expertise in screens and protein enrichment analysis), and the process through which the data was generated, our question becomes: What is the probability that Gene X is more abundant in the post-screen sample <span class="math notranslate nohighlight">\(H_{t_1}\)</span>? When considering the distribution of the <span class="math notranslate nohighlight">\(H_{t_1}\)</span> sample, we might initially think of a normal distribution. However, given the nature of read count data in such analyses, a negative-binomial distribution is often more suitable. Translating this into mathematical notation gives us:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align*}
+&amp;\begin{aligned}
+\text{(1)}\\
+(H_{t_1,i} | H_{t_0,i}) &amp;\sim \text{Normal}(\mu, \sigma)\\
+\mu &amp;= \alpha + \beta \times H_{t_0,i}\\
+\end{aligned}
+&amp;&amp;
+\begin{aligned}
+\text{OR}\\
+\end{aligned}
+&amp;&amp;&amp;
+\begin{aligned}
+\text{(2)}\\
+(H_{t_1,i} | H_{t_0,i}) &amp;\sim \text{NB}(\mu, \alpha)\\
+\mu &amp;= \alpha + \beta \times H_{t_0,i}\\
+\end{aligned}
+\end{align*}
+\end{split}\]</div>
+<p>The next step involves choosing the most appropriate priors for the <span class="math notranslate nohighlight">\(\beta\)</span> parameters. By tapping into public data on CRISPR screens, such as that available from <a class="reference external" href="https://orcs.thebiogrid.org/">BioGrid ORCS</a>, we learn that the distribution of fold changes spans from -4 to 4, guiding us toward a weakly informative prior range.</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">imageio</span>
+<span class="c1"># Read the image file</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">imageio</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/gkanfer/AIPySdeAnalyzer/main/Prior_distribution.png&#39;</span><span class="p">)</span>
+<span class="c1"># Display the image</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>  <span class="c1"># remove axis</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<p><img alt="Some description" src="../../_images/output_5_1.png" /></p>
+<p>A particularly useful tool in defining these priors is the <code class="docutils literal notranslate"><span class="pre">find_constrained_prior</span></code> feature within PyMC. The process of selecting priors, along with prior predictive analysis, is comprehensively detailed in an insightful blog post.</p>
+<p>This structure not only sets the stage for constructing our model but also ensures that our approach is grounded in both theoretical knowledge and empirical evidence, effectively bridacing the gap between statistical theory and practical application in experimental biology.</p>
+<p>Next, we’ll build these models and see how they compare.</p>
+<p>First we will prepare the data into a format which is compatible for pymc analysis. It is important to keep in mind the dimension of the data. Here is great notebook explaining pymc data handling and dimension consideration <a class="reference external" href="https://oriolabrilpla.cat/en/blog/posts/2020/pymc3-arviz.html">labeled coords</a>:</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dftall_h0</span> <span class="o">=</span> <span class="n">dftall</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dftall</span><span class="p">[</span><span class="s2">&quot;tag&quot;</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">,:]</span>
+<span class="n">dftall_h1</span> <span class="o">=</span> <span class="n">dftall</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dftall</span><span class="p">[</span><span class="s2">&quot;tag&quot;</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">,:]</span>
+<span class="n">dftall_M</span> <span class="o">=</span> <span class="n">dftall</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dftall</span><span class="p">[</span><span class="s2">&quot;tag&quot;</span><span class="p">]</span><span class="o">==</span><span class="mi">2</span><span class="p">,:]</span>
+<span class="n">sgRNA</span><span class="p">,</span> <span class="n">mn_sgRNA</span> <span class="o">=</span> <span class="n">dftall_h0</span><span class="o">.</span><span class="n">sgRNA</span><span class="o">.</span><span class="n">factorize</span><span class="p">()</span>
+<span class="n">Genes</span><span class="p">,</span> <span class="n">mn_Genes</span> <span class="o">=</span> <span class="n">dftall_h0</span><span class="o">.</span><span class="n">Gene</span><span class="o">.</span><span class="n">factorize</span><span class="p">()</span>
+<span class="n">h0</span> <span class="o">=</span> <span class="n">dftall_h0</span><span class="o">.</span><span class="n">readCount</span><span class="o">.</span><span class="n">values</span>
+<span class="n">h1</span> <span class="o">=</span> <span class="n">dftall_h1</span><span class="o">.</span><span class="n">readCount</span><span class="o">.</span><span class="n">values</span>
+<span class="n">M</span> <span class="o">=</span> <span class="n">dftall_M</span><span class="o">.</span><span class="n">readCount</span><span class="o">.</span><span class="n">values</span>
+<span class="n">xy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">h0</span><span class="p">),</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">xy</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">h0</span>
+<span class="n">xy</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">h1</span>
+<span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;sgRNA&quot;</span><span class="p">:</span> <span class="n">mn_sgRNA</span><span class="p">,</span><span class="s2">&quot;Genes&quot;</span><span class="p">:</span> <span class="n">mn_Genes</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<p>Complete pooling Normal likelihood model:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span> <span class="k">as</span> <span class="n">Normal</span><span class="p">:</span>
+  <span class="n">beta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+  <span class="n">Mu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;Mu&quot;</span><span class="p">,</span><span class="n">h1</span><span class="o">+</span><span class="n">beta</span><span class="o">*</span><span class="n">h0</span><span class="p">)</span>
+  <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span><span class="n">mu</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+  <span class="n">count</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">,</span><span class="n">mu</span> <span class="o">=</span> <span class="n">Mu</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">h1</span><span class="p">)</span>
+  <span class="n">trace_NCP</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">target_accept</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span><span class="n">chains</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="n">RANDOM_SEED</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Complete pooling Normal Negative-Binomial model:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span> <span class="k">as</span> <span class="n">NB_CP</span><span class="p">:</span>
+  <span class="n">beta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+  <span class="n">Mu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;Mu&quot;</span><span class="p">,</span><span class="n">h1</span><span class="o">+</span><span class="n">beta</span><span class="o">*</span><span class="n">h0</span><span class="p">)</span>
+  <span class="n">alpha</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="s2">&quot;alpha&quot;</span><span class="p">,</span><span class="n">mu</span> <span class="o">=</span> <span class="mf">28.5</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="mf">10.5</span><span class="p">)</span>
+
+  <span class="n">count</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">NegativeBinomial</span><span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">,</span><span class="n">mu</span> <span class="o">=</span> <span class="n">Mu</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">h1</span><span class="p">)</span>
+  <span class="n">trace_NBCP</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">target_accept</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span><span class="n">chains</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="n">RANDOM_SEED</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">Normal</span><span class="p">:</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">compute_log_likelihood</span><span class="p">(</span><span class="n">trace_NCP</span><span class="p">)</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">sample_posterior_predictive</span><span class="p">(</span><span class="n">trace_NCP</span><span class="p">,</span> <span class="n">extend_inferencedata</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">NB_CP</span><span class="p">:</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">compute_log_likelihood</span><span class="p">(</span><span class="n">trace_NBCP</span><span class="p">)</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">sample_posterior_predictive</span><span class="p">(</span><span class="n">trace_NBCP</span><span class="p">,</span> <span class="n">extend_inferencedata</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">plot_ppc</span><span class="p">(</span><span class="n">trace_NCP</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;posterior&#39;</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">textsize</span> <span class="o">=</span> <span class="mi">12</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">plot_ppc</span><span class="p">(</span><span class="n">trace_NBCP</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;posterior&#39;</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">textsize</span> <span class="o">=</span> <span class="mi">12</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><img alt="Some description" src="../../_images/output_12_10.png" /></p>
+<p>Based on the samples from the posterior predictive checks, it’s evident that the Negative Binomial (NB) model provides a better fit to the observed data. However, this model aggregates all information from Ht0 and the priors, essentially smoothing over the details. Is there an opportunity for refinement? Definitely. In pursuit of enhanced model performance, we plan to investigate various strategies, including no pooling and partial pooling.</p>
+<p>Such exploration naturally progresses into the domain of hierarchical approaches, where each group is assigned an independent prior. With 96 distinct sgRNAs per sample in our dataset, the hierarchical method becomes particularly appealing. Under this scheme, during the HMC (Hamiltonian Monte Carlo) sampling process, a unique parameter will be estimated for every one of these sgRNAs, promising a more nuanced and potentially more accurate modeling of our data.</p>
+<p>Building upon the exploration of enhancing our model’s performance, it’s valuable to further explain the “no-pooling” and “partial pooling” strategies in the context of hierarchical approaches.</p>
+<p>The “no-pooling” approach is intriguingly described in McElreath’s Rethinking book as an “amnesia” process. In this strategy, every simulation step independently draws a new parameter from the distribution, entirely unaffected by the population-level estimation (Equation 3). This method treats each group as distinct and separate, without leveraging the collective insights that could be gained from considering the broader trends across groups.</p>
+<p>Contrastingly, the “partial pooling” strategy allows the population-level estimation to influence the group-level draw. This approach acknowledges that while each group may exhibit unique behaviors or characteristics, there is value in the shared patterns observed across the entire population. This method seeks a middle ground, where parameters are estimated with an awareness of both individual group dynamics and overarching population trends (Equation 4).</p>
+<p>Adding these insights provides a clearer, more holistic view of how “no-pooling” and “partial pooling” operate within hierarchical modeling, paving the way for deeper understanding and application of these methods.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align*}
+&amp;\begin{aligned}
+\text{(3)}\\
+(H_{t_1,i} | H_{t_0,i}) &amp;\sim \text{NB}(\mu, \alpha)\\
+\beta_{i} &amp;= \alpha + \beta_{i} \times H_{t_0,i}\\
+\beta_{i} &amp;\sim Normal(1,1)\\
+\end{aligned}
+&amp;&amp;
+\begin{aligned}
+\text{OR}\\
+\end{aligned}
+&amp;&amp;&amp;
+\begin{aligned}
+\text{(4)}\\
+(H_{t_1,i} | H_{t_0,i}) &amp;\sim \text{NB}(\mu, \alpha)\\
+\beta_{i} &amp;= \alpha + \beta_{i} \times H_{t_0,i}\\
+\beta_{i} &amp;\sim Normal(\bar{beta} \sim Normal(1,1), \bar{sigma} \sim HlfNor(1))\\
+\end{aligned}
+\end{align*}
+\end{split}\]</div>
+<p>Start with the no-pooling approach:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span> <span class="k">as</span> <span class="n">NB_noPooling</span><span class="p">:</span>
+  <span class="c1">#Hyper-proirs</span>
+  <span class="n">beta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;sgRNA&quot;</span><span class="p">))</span>
+
+  <span class="n">Mu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;Mu&quot;</span><span class="p">,</span><span class="n">h1</span><span class="o">+</span><span class="n">beta</span><span class="p">[</span><span class="n">sgRNA</span><span class="p">]</span><span class="o">*</span><span class="n">h0</span><span class="p">)</span>
+  <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span><span class="n">mu</span> <span class="o">=</span> <span class="mf">28.5</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="mf">10.5</span><span class="p">)</span>
+
+  <span class="n">count</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">NegativeBinomial</span><span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">,</span><span class="n">mu</span> <span class="o">=</span> <span class="n">Mu</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">h1</span><span class="p">)</span>
+  <span class="n">trace_noPooling</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">target_accept</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span><span class="n">chains</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="n">RANDOM_SEED</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Than partial pooling</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span> <span class="k">as</span> <span class="n">NB_partialPooling</span><span class="p">:</span>
+  <span class="c1">#Hyper-proirs</span>
+  <span class="n">beta_bar</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;beta_bar&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="n">sigma_bar</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s2">&quot;sigma_bar&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+  <span class="c1">#noncenterd</span>
+  <span class="n">z_beta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;z_beta&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;sgRNA&quot;</span><span class="p">))</span>
+  <span class="n">beta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="n">beta_bar</span> <span class="o">+</span> <span class="n">z_beta</span><span class="o">*</span><span class="n">sigma_bar</span><span class="p">)</span>
+
+  <span class="n">Mu</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;Mu&quot;</span><span class="p">,</span><span class="n">h1</span><span class="o">+</span><span class="n">beta</span><span class="p">[</span><span class="n">sgRNA</span><span class="p">]</span><span class="o">*</span><span class="n">h0</span><span class="p">)</span>
+  <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span><span class="n">mu</span> <span class="o">=</span> <span class="mf">28.5</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="mf">10.5</span><span class="p">)</span>
+
+  <span class="n">count</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">NegativeBinomial</span><span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">,</span><span class="n">mu</span> <span class="o">=</span> <span class="n">Mu</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="n">h1</span><span class="p">)</span>
+  <span class="n">trace_partialPooling</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">target_accept</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span><span class="n">chains</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="n">RANDOM_SEED</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">NB_noPooling</span><span class="p">:</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">compute_log_likelihood</span><span class="p">(</span><span class="n">trace_noPooling</span><span class="p">)</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">sample_posterior_predictive</span><span class="p">(</span><span class="n">trace_noPooling</span><span class="p">,</span> <span class="n">extend_inferencedata</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">NB_partialPooling</span><span class="p">:</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">compute_log_likelihood</span><span class="p">(</span><span class="n">trace_partialPooling</span><span class="p">)</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">sample_posterior_predictive</span><span class="p">(</span><span class="n">trace_partialPooling</span><span class="p">,</span> <span class="n">extend_inferencedata</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">plot_ppc</span><span class="p">(</span><span class="n">trace_noPooling</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;posterior&#39;</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">textsize</span> <span class="o">=</span> <span class="mi">12</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">plot_ppc</span><span class="p">(</span><span class="n">trace_partialPooling</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;posterior&#39;</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">textsize</span> <span class="o">=</span> <span class="mi">12</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><img alt="Some description" src="../../_images/output_17_10.png" /></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">df_comp_loo</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">compare</span><span class="p">({</span><span class="s2">&quot;NB_complete_pooling&quot;</span><span class="p">:</span> <span class="n">trace_NBCP</span><span class="p">,</span> <span class="s2">&quot;NB_noPooling&quot;</span><span class="p">:</span> <span class="n">trace_noPooling</span><span class="p">,</span> <span class="s2">&quot;NB_partial_pooling&quot;</span><span class="p">:</span> <span class="n">trace_partialPooling</span><span class="p">})</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">plot_compare</span><span class="p">(</span><span class="n">df_comp_loo</span><span class="p">,</span> <span class="n">insample_dev</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><img alt="Some description" src="../../_images/output_18_0.png" /></p>
+<p>Deciphering the results from posterior predictive checks can be challenging when trying to determine which model performs better. However, the Bayesian framework equips us with a plethora of tools for model comparison. In essence, these tools allow us to compare models based on their expected log pointwise predictive density (ELPD), utilizing information criteria for model ranking. For a more detailed explanation, refer to Chapter 7 (page 207, second edition) of <em>Statistical Rethinking</em> by McElreath. Interestingly, in our analysis, there seems to be no significant difference between the partial pooling and complete pooling approaches. We will, therefore, continue our journey, focusing on refining the partial pooling model.</p>
+<p>One of the most thrilling aspects of the Bayesian approach is its efficiency in harnessing information to reduce uncertainty. It operates on the principle that leaving no information unused can help decrease uncertainty. This approach is beneficial, especially when considering the natural high dispersion in our datasets across features (sgRNAs) and samples, attributed to complex biological variability and experimental conditions.</p>
+<p>A notable factor contributing to this dispersion is the high multiplicity of infection (MOI) strategy. Employing a high MOI, where cells are exposed to more than one sgRNA, aids in ensuring comprehensive genomic coverage. However, the coexistence of multiple sgRNAs within a single cell complicates identifying the sgRNA responsible for specific changes in cellular fitness. Addressing this complexity calls for a sophisticated approach to data analysis that acknowledges and adjusts for the potential overrepresentation of sgRNAs due to high MOI.</p>
+<p>The introduction of a high MOI brings about a collider effect—a statistical phenomenon that emerges when the relationship between two variables (sgRNA and cellular fitness, in our context) is influenced by a third variable (MOI). This effect can cloud the actual influence of specific sgRNAs on cellular fitness, leading to possible misinterpretations of our findings. To effectively tackle this issue and minimize the confounding impact, it’s crucial to include data on sgRNA abundance before infection. This inclusion sets a reference point, making post-treatment changes more discernible.</p>
+<p>Additionally, factoring in sgRNA efficiency, derived from preceding CRISPR screen data, aids in accommodating variability in sgRNA performance. These critical adjustments enhance our comprehension of the role sgRNAs play in cellular fitness, paving the way for interpretations of the data that thoughtfully consider the collider effect introduced by high MOI.</p>
+<p><a class="reference external" href="https://towardsdatascience.com/a-step-by-step-guide-in-detecting-causal-relationships-using-bayesian-structure-learning-in-python-c20c6b31cee5">causal inference</a></p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.family&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;serif&quot;</span>
+<span class="kn">import</span> <span class="nn">bnlearn</span> <span class="k">as</span> <span class="nn">bn</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="s2">&quot;Ht0&quot;</span><span class="p">,</span> <span class="s2">&quot;Ht1&quot;</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">})</span>
+<span class="n">edges</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;Ht0&quot;</span><span class="p">,</span> <span class="s2">&quot;Ht1&quot;</span><span class="p">),</span>
+         <span class="p">(</span><span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="s1">&#39;Ht0&#39;</span><span class="p">),</span>
+         <span class="p">(</span><span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;Ht0&#39;</span><span class="p">),</span>
+         <span class="p">(</span><span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;Ht1&#39;</span><span class="p">)]</span>
+<span class="n">DAG</span> <span class="o">=</span> <span class="n">bn</span><span class="o">.</span><span class="n">make_DAG</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+<span class="n">node_properties</span> <span class="o">=</span> <span class="n">bn</span><span class="o">.</span><span class="n">get_node_properties</span><span class="p">(</span><span class="n">DAG</span><span class="p">)</span>
+<span class="n">node_properties</span><span class="p">[</span><span class="s1">&#39;U&#39;</span><span class="p">][</span><span class="s1">&#39;node_color&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;#FF0000&#39;</span>
+<span class="n">node_properties</span><span class="p">[</span><span class="s1">&#39;M&#39;</span><span class="p">][</span><span class="s1">&#39;node_color&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;#0000FF&#39;</span>
+<span class="n">node_properties</span><span class="p">[</span><span class="s1">&#39;Ht0&#39;</span><span class="p">][</span><span class="s1">&#39;node_color&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;#0000FF&#39;</span>
+<span class="n">node_properties</span><span class="p">[</span><span class="s1">&#39;Ht1&#39;</span><span class="p">][</span><span class="s1">&#39;node_color&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;#008000&#39;</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">bn</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">DAG</span><span class="p">,</span> <span class="n">node_properties</span><span class="o">=</span><span class="n">node_properties</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">params_static</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;font_size&#39;</span><span class="p">:</span><span class="mi">12</span><span class="p">,</span> <span class="s1">&#39;font_family&#39;</span><span class="p">:</span><span class="s1">&#39;serif&#39;</span><span class="p">,</span> <span class="s1">&#39;alpha&#39;</span><span class="p">:</span><span class="mf">0.8</span><span class="p">,</span> <span class="s1">&#39;node_shape&#39;</span><span class="p">:</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;facecolor&#39;</span><span class="p">:</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;font_color&#39;</span><span class="p">:</span><span class="s1">&#39;#000000&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<p><img alt="Some description" src="../../_images/output_20_1.png" /></p>
+<p>Deciphering the results from posterior predictive checks can be challenging when trying to determine which model performs better. However, the Bayesian framework equips us with a plethora of tools for model comparison. In essence, these tools allow us to compare models based on their expected log pointwise predictive density (ELPD), utilizing information criteria for model ranking. For a more detailed explanation, refer to Chapter 7 (page 207, second edition) of <em>Statistical Rethinking</em> by McElreath. Interestingly, in our analysis, there seems to be no significant difference between the partial pooling and complete pooling approaches. We will, therefore, continue our journey, focusing on refining the partial pooling model.</p>
+<p>One of the most thrilling aspects of the Bayesian approach is its efficiency in harnessing information to reduce uncertainty. It operates on the principle that leaving no information unused can help decrease uncertainty. This approach is beneficial, especially when considering the natural high dispersion in our datasets across features (sgRNAs) and samples, attributed to complex biological variability and experimental conditions.</p>
+<p>A notable factor contributing to this dispersion is the high multiplicity of infection (MOI) strategy. Employing a high MOI, where cells are exposed to more than one sgRNA, aids in ensuring comprehensive genomic coverage. However, the coexistence of multiple sgRNAs within a single cell complicates identifying the sgRNA responsible for specific changes in cellular fitness. Addressing this complexity calls for a sophisticated approach to data analysis that acknowledges and adjusts for the potential overrepresentation of sgRNAs due to high MOI.</p>
+<p>The introduction of a high MOI brings about a collider effect—a statistical phenomenon that emerges when the relationship between two variables (sgRNA and cellular fitness, in our context) is influenced by a third variable (MOI). This effect can cloud the actual influence of specific sgRNAs on cellular fitness, leading to possible misinterpretations of our findings. To effectively tackle this issue and minimize the confounding impact, it’s crucial to include data on sgRNA abundance before infection. This inclusion sets a reference point, making post-treatment changes more discernible.</p>
+<p>Additionally, factoring in sgRNA efficiency, derived from preceding CRISPR screen data, aids in accommodating variability in sgRNA performance. These critical adjustments enhance our comprehension of the role sgRNAs play in cellular fitness, paving the way for interpretations of the data that thoughtfully consider the collider effect introduced by high MOI. Building on our analysis, we now turn to incorporating information about our master plasmid into our model using a varying effect. This technique represents a significant advancement in the Bayesian framework, offering the capability to account for how changes in <span class="math notranslate nohighlight">\(H_{t0}\)</span> covary with the composition of the master sample before cell infection.</p>
+<p>The inclusion of varying effects is more than just a methodological step forward; it’s a crucial strategy for enriching our model with depth and specificity. By integrating the master plasmid’s (M) compositional data, we enable our model to reflect the nuanced relationship between the initial sgRNA population and subsequent cellular outcomes post-infection. This approach aligns with the overarching goal of reducing uncertainty by leveraging available information to its fullest extent, ensuring that our analysis is both comprehensive and precise. Through this, we enhance our understanding of sgRNA dynamics, leading to more informed interpretations of genetic interactions and their impacts on cellular fitness.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align*}
+(H_{t_1,i} , H_{t_0,i}) &amp;\sim \text{NB}(\mu_{ij}, \alpha)\\
+\mu_{ij} &amp;= \alpha + V_{ij} \times \beta_{i} \times H_{t_0,i} + V_{ij} \times \theta_{i} \times M \\
+\beta_{i} &amp;\sim Normal(\bar{beta} \sim Normal(1,1), \bar{sigma} \sim HlfNor(1))\\
+\theta_{i} &amp;\sim Normal(\tilde{beta} \sim Normal(1,1), \tilde{sigma} \sim HlfNor(1))\\
+V_{ij} &amp;\sim \text{MvNormal}(\begin{bmatrix}\mu_{ij=1}\\ \mu_{ij=2}\ \end{bmatrix}, \Sigma_{j})\\
+\Sigma_{j} &amp;\sim \text{LKJCholeskyCov}(n=2, eta=3, \nu=\text{HalfNormal}(\sigma = 1)) \\
+\end{align*}
+\end{split}\]</div>
+<p>The model employs a Negative Binomial (NB) distribution to describe the relationship between the sgRNA read counts observed after the screening process (<span class="math notranslate nohighlight">\(H_{t_1,i}\)</span>) and before the screening process (<span class="math notranslate nohighlight">\(H_{t_0,i}\)</span>) for each sample <span class="math notranslate nohighlight">\(i\)</span>. The mean (<span class="math notranslate nohighlight">\(\mu_{ij}\)</span>) of the NB distribution is influenced by the master plasmid’s compositional data (<span class="math notranslate nohighlight">\(M\)</span>) and a vector of variables (<span class="math notranslate nohighlight">\(V_{ij}\)</span>), including perhaps experimental conditions or other covariates.</p>
+<p>The variable <span class="math notranslate nohighlight">\(\beta_{i}\)</span> is introduced as a random effect to account for variability between sgRNAs, allowing for diverse sgRNA efficiencies across samples. It is modeled as a normal distribution with its mean centered around <span class="math notranslate nohighlight">\(\bar{\beta}\)</span>.</p>
+<p>Similarly, <span class="math notranslate nohighlight">\(\theta_{i}\)</span> encapsulates the varying effects of the master plasmid on the screening outcome. It is also modeled as a normal distribution, but with a mean that relies on <span class="math notranslate nohighlight">\(\tilde{\beta}\)</span>, which could represent additional parameters related to the master plasmid.</p>
+<p><span class="math notranslate nohighlight">\(V_{ij}\)</span> is conceived as a multivariate normal random variable to capture the correlations between multiple observations or experimental conditions, represented with the covariance matrix <span class="math notranslate nohighlight">\(\Sigma_{j}\)</span>.</p>
+<p>The covariance matrix <span class="math notranslate nohighlight">\(\Sigma_{j}\)</span> itself is informed by an LKJ Cholesky prior, which is parametrized by <span class="math notranslate nohighlight">\(\eta\)</span> and encourages a certain level of correlation between the elements of <span class="math notranslate nohighlight">\(V_{ij}\)</span>. This choice of prior adds flexibility to the model in learning the relationships between different variables.</p>
+<p>The HalfNormal distributions for <span class="math notranslate nohighlight">\(\bar{\sigma}\)</span> and <span class="math notranslate nohighlight">\(\tilde{\sigma}\)</span> suggest that these variables have a predefined likelihood of spanning positive values, making them suitable for defining the standard deviations of the normal distributions for <span class="math notranslate nohighlight">\(\beta_{i}\)</span> and <span class="math notranslate nohighlight">\(\theta_{i}\)</span>.</p>
+<p>This Bayesian model framework allows for pooling information across different sgRNAs and samples, enabling an informed analysis that captures the complexities inherent to the high multiplicity of infection strategy, such as the collider effect.</p>
+<p>To refine the description to align perfectly with your intended model and context, please ensure that all symbol definitions match your underlying mathematical and biological assumptions.</p>
+<p>To efficiently handle the complexity and increased number of parameters in the Bayesian model, we leverage the power of GPUs through the use of the <code class="docutils literal notranslate"><span class="pre">JAX</span></code> package. <code class="docutils literal notranslate"><span class="pre">JAX</span></code> provides an environment for high-performance machine learning research, offering the speed necessary to conduct large-scale simulations and sophisticated statistical analyses.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>For users working on Google Colab, it is highly recommended to utilize the <code class="docutils literal notranslate"><span class="pre">Numpyro</span></code> library, which can be easily installed using the pip package manager:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>!pip<span class="w"> </span>install<span class="w"> </span>numpyro
+</pre></div>
+</div>
+<p><a class="reference external" href="https://colab.research.google.com/drive/1c2GLGSg05E7GLvHRA5RwJTcTfN4uUJQA">colab</a></p>
+<p><code class="docutils literal notranslate"><span class="pre">Numpyro</span></code> is designed to work with JAX, and it efficiently scales to large datasets and models. This library enables the use of hardware acceleration, such as TPUs provided by the Colab environment, dramatically reducing the time required for sampling. This acceleration is especially beneficial when running complex Bayesian models that require extensive computational power.</p>
+<p>By integrating Numpyro and utilizing Google Colab’s TPUs, modelers can significantly expedite the model fitting process without sacrificing the detail and depth of their analyses.</p>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">coords</span><span class="p">[</span><span class="s2">&quot;experiment&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="k">with</span> <span class="n">pm</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span> <span class="k">as</span> <span class="n">mvn_partialPooling_covar</span><span class="p">:</span>
+  <span class="c1">#Hyper-proirs</span>
+  <span class="n">beta_bar</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;beta_bar&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="n">sigma_bar</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s2">&quot;sigma_bar&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+  <span class="n">theta_bar</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;theta_bar&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+  <span class="n">sigma_theta_bar</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">HalfNormal</span><span class="p">(</span><span class="s2">&quot;sigma_theta_bar&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+  <span class="c1">#Hyper-proir noncentered</span>
+  <span class="n">z_beta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;z_beta&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;sgRNA&quot;</span><span class="p">))</span>
+  <span class="n">beta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;beta&quot;</span><span class="p">,</span> <span class="n">beta_bar</span> <span class="o">+</span> <span class="n">z_beta</span><span class="o">*</span><span class="n">sigma_bar</span><span class="p">)</span>
+
+  <span class="n">z_theta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;z_theta&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;sgRNA&quot;</span><span class="p">))</span>
+  <span class="n">theta</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="s2">&quot;theta&quot;</span><span class="p">,</span><span class="n">theta_bar</span> <span class="o">+</span> <span class="n">z_theta</span><span class="o">*</span><span class="n">sigma_theta_bar</span><span class="p">)</span>
+
+  <span class="n">chol</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">LKJCholeskyCov</span><span class="p">(</span>
+      <span class="s2">&quot;chol_cov&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">sd_dist</span><span class="o">=</span><span class="n">pm</span><span class="o">.</span><span class="n">Exponential</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="mf">2.0</span><span class="p">),</span> <span class="n">compute_corr</span><span class="o">=</span><span class="kc">True</span>
+  <span class="p">)</span>
+  <span class="n">ve</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;ve&quot;</span><span class="p">,</span> <span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">chol</span><span class="p">,</span><span class="n">pt</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">theta</span><span class="p">,</span><span class="n">beta</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+  <span class="n">Mu_Y</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;Mu_Y&quot;</span><span class="p">,</span><span class="n">h1</span> <span class="o">+</span> <span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">ve</span><span class="p">[</span><span class="n">sgRNA</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span><span class="o">*</span><span class="n">h0</span><span class="p">)</span>
+  <span class="n">Mu_X</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Deterministic</span><span class="p">(</span><span class="s2">&quot;Mu_X&quot;</span><span class="p">,</span><span class="n">pm</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">ve</span><span class="p">[</span><span class="n">sgRNA</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">M</span><span class="p">)</span>
+
+  <span class="n">XY_obs</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Data</span><span class="p">(</span><span class="s2">&quot;XY_obs&quot;</span><span class="p">,</span> <span class="n">xy</span><span class="p">,</span> <span class="n">mutable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+  <span class="n">sigma</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">Gamma</span><span class="p">(</span><span class="s2">&quot;sigma&quot;</span><span class="p">,</span><span class="n">mu</span> <span class="o">=</span> <span class="mf">28.5</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="mf">10.5</span><span class="p">,</span><span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;experiment&quot;</span><span class="p">))</span>
+
+  <span class="n">count_h0</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">NegativeBinomial</span><span class="p">(</span><span class="s2">&quot;count_h0&quot;</span><span class="p">,</span> <span class="n">mu</span> <span class="o">=</span> <span class="n">Mu_X</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">observed</span><span class="o">=</span><span class="n">h0</span><span class="p">)</span>
+  <span class="n">count_h1</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">NegativeBinomial</span><span class="p">(</span><span class="s2">&quot;count_h1&quot;</span><span class="p">,</span> <span class="n">mu</span> <span class="o">=</span> <span class="n">Mu_Y</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">observed</span><span class="o">=</span><span class="n">h1</span><span class="p">)</span>
+  <span class="n">trace_partialPooling_covar_mvn</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">target_accept</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">chains</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">random_seed</span><span class="o">=</span><span class="n">RANDOM_SEED</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">mvn_partialPooling_covar</span><span class="p">:</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">compute_log_likelihood</span><span class="p">(</span><span class="n">trace_partialPooling_covar_mvn</span><span class="p">)</span>
+    <span class="n">pm</span><span class="o">.</span><span class="n">sample_posterior_predictive</span><span class="p">(</span><span class="n">trace_partialPooling_covar_mvn</span><span class="p">,</span> <span class="n">extend_inferencedata</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">plot_ppc</span><span class="p">(</span><span class="n">trace_partialPooling_covar_mvn</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="s1">&#39;posterior&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><img alt="Some description" src="../../_images/output_24_5.png" /></p>
+<p>Using the simulation data, we can access a list called <code class="docutils literal notranslate"><span class="pre">df.effective_sgRNA_flat</span></code>, which includes the target sgRNAs identified as true positives. With this list, we can verify whether these identified hits are distinguishable within our model at both the sgRNA and gene levels.</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">arviz</span> <span class="kn">import</span> <span class="n">hdi</span>
+<span class="n">trace_mean_h1</span> <span class="o">=</span> <span class="n">trace_partialPooling_covar_mvn</span><span class="o">.</span><span class="n">posterior_predictive</span><span class="p">[</span><span class="s1">&#39;count_h1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;chain&quot;</span><span class="p">,</span> <span class="s2">&quot;draw&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">values</span>
+<span class="n">trace_mean_h0</span> <span class="o">=</span> <span class="n">trace_partialPooling_covar_mvn</span><span class="o">.</span><span class="n">posterior_predictive</span><span class="p">[</span><span class="s1">&#39;count_h0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;chain&quot;</span><span class="p">,</span> <span class="s2">&quot;draw&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">values</span>
+<span class="n">FC_mean</span> <span class="o">=</span> <span class="n">trace_mean_h1</span><span class="o">/</span><span class="n">trace_mean_h0</span>
+
+<span class="c1"># array for HDI analysis</span>
+<span class="n">trace_h1</span> <span class="o">=</span> <span class="n">trace_partialPooling_covar_mvn</span><span class="o">.</span><span class="n">posterior_predictive</span><span class="p">[</span><span class="s1">&#39;count_h1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">trace_h0</span> <span class="o">=</span> <span class="n">trace_partialPooling_covar_mvn</span><span class="o">.</span><span class="n">posterior_predictive</span><span class="p">[</span><span class="s1">&#39;count_h0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">FC</span> <span class="o">=</span> <span class="n">trace_h1</span><span class="o">/</span><span class="n">trace_h0</span>
+
+<span class="c1">#mapping sgRNA</span>
+<span class="n">sgRNAMapIdx</span> <span class="o">=</span> <span class="p">{</span><span class="n">sg</span><span class="p">:[]</span> <span class="k">for</span> <span class="n">sg</span> <span class="ow">in</span> <span class="n">dftall_h0</span><span class="o">.</span><span class="n">sgRNA</span><span class="o">.</span><span class="n">values</span><span class="p">}</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">sg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dftall_h0</span><span class="o">.</span><span class="n">sgRNA</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+    <span class="n">sgRNAMapIdx</span><span class="p">[</span><span class="n">sg</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+<span class="c1">#mapping Gene</span>
+<span class="n">geneMapIdx</span> <span class="o">=</span> <span class="p">{</span><span class="n">g</span><span class="p">:[]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">dftall_h0</span><span class="o">.</span><span class="n">Gene</span><span class="o">.</span><span class="n">values</span><span class="p">}</span>
+<span class="k">for</span> <span class="n">z</span><span class="p">,</span><span class="n">g</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dftall_h0</span><span class="o">.</span><span class="n">Gene</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+    <span class="n">geneMapIdx</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="c1">#fcTable = {&quot;sg&quot;:[],&quot;FC&quot;:[],&quot;hdiL&quot;:[],&quot;hdiH&quot;:[]}</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">sg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dftall_h0</span><span class="o">.</span><span class="n">sgRNA</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+    <span class="n">arrTemp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">hdi</span><span class="p">(</span><span class="n">FC</span><span class="p">[:,:,</span><span class="n">sgRNAMapIdx</span><span class="p">[</span><span class="n">sg</span><span class="p">]],</span><span class="n">skipna</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sg</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">effective_sgRNA_flat</span><span class="p">:</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">sg</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">FC_mean</span><span class="p">[</span><span class="n">sgRNAMapIdx</span><span class="p">[</span><span class="n">sg</span><span class="p">]])</span> <span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span><span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;red&quot;</span> <span class="p">,</span><span class="n">edgecolor</span><span class="o">=</span> <span class="s2">&quot;black&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">sg</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">FC_mean</span><span class="p">[</span><span class="n">sgRNAMapIdx</span><span class="p">[</span><span class="n">sg</span><span class="p">]])</span> <span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span><span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;none&quot;</span> <span class="p">,</span><span class="n">edgecolor</span><span class="o">=</span> <span class="s2">&quot;black&quot;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">sg</span><span class="p">,</span><span class="n">sg</span><span class="p">],[</span><span class="n">arrTemp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">arrTemp</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;solid&#39;</span><span class="p">,</span><span class="n">c</span><span class="o">=</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;sgRNA&quot;</span><span class="p">)</span>
+<span class="c1"># for label in axes[0].get_xticklabels():</span>
+<span class="c1">#     label.set_rotation(45)</span>
+<span class="c1">#     label.set_fontsize(4)</span>
+
+
+
+<span class="k">for</span> <span class="n">z</span><span class="p">,</span><span class="n">g</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dftall_h0</span><span class="o">.</span><span class="n">Gene</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+    <span class="n">arrTemp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">hdi</span><span class="p">(</span><span class="n">FC</span><span class="p">[:,:,</span><span class="n">geneMapIdx</span><span class="p">[</span><span class="n">g</span><span class="p">]],</span><span class="n">skipna</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">g</span><span class="p">,</span><span class="n">g</span><span class="p">],[</span><span class="n">arrTemp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">arrTemp</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;solid&#39;</span><span class="p">,</span><span class="n">c</span><span class="o">=</span> <span class="s1">&#39;k&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">effective_sgRNA_flat</span><span class="p">:</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">g</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">FC_mean</span><span class="p">[</span><span class="n">geneMapIdx</span><span class="p">[</span><span class="n">g</span><span class="p">]])</span> <span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span><span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;red&quot;</span> <span class="p">,</span><span class="n">edgecolor</span><span class="o">=</span> <span class="s2">&quot;black&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">g</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">FC_mean</span><span class="p">[</span><span class="n">geneMapIdx</span><span class="p">[</span><span class="n">g</span><span class="p">]])</span> <span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span><span class="n">facecolor</span><span class="o">=</span><span class="s2">&quot;none&quot;</span> <span class="p">,</span><span class="n">edgecolor</span><span class="o">=</span> <span class="s2">&quot;black&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">():</span>
+    <span class="n">label</span><span class="o">.</span><span class="n">set_rotation</span><span class="p">(</span><span class="mi">45</span><span class="p">)</span>
+    <span class="n">label</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Gene&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<p><img alt="Some description" src="../../_images/output_27_1.png" /></p>
+<p>The results are quite evident; our model successfully differentiates these hits, making them distinctly noticeable when examining the individual sgRNA and gene data.</p>
+<p>In the second part of this presentation, I will demonstrate how we can make use of the list of hits extracted from the simulation. I will show how to conduct hypothesis testing within a Bayesian framework, utilizing these hits to illustrate the process.</p>
+</section>
+</section>
+</section>
+
+<div class="section">
+    
+
+<div class="section">
+  <span style="float: left">
+    
+  </span>
+  <span>&nbsp;</span>
+  <span style="float: right">
+     
+    <a href="bayesCell_analysis_Part2.html">
+      Using the Bayesian Approach with PyMC to Analyze Functional Genomics Screens, Part 2 <i
+        class="fa fa-arrow-circle-right"
+      ></i
+      >
+    </a>
+    
+  </span>
+</div>
+  
+</div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-challenge-at-hand">The Challenge at Hand</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simulating-the-dynamics-of-crispr-screens-and-diving-into-eda">Simulating the Dynamics of CRISPR Screens and Diving Into EDA</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-started-with-the-package">Getting Started with the Package</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#phase-1-simulating-initial-sgrna-interactions">Phase 1: Simulating Initial sgRNA Interactions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#phase-2-post-screening-simulation">Phase 2: Post-Screening Simulation</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/blog/2024/bayesCell_analysis.md.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright Gil Kanfer.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
